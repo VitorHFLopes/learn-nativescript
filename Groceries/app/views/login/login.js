@@ -1,8 +1,8 @@
-var observableModule = require("data/observable");
-
-var user = new observableModule.fromObject({
-    email: "user@domain.com",
-    password: "password"
+var dialogsModule = require("ui/dialogs");
+var UserViewModel = require("../../shared/view-models/user-view-model");
+var user = new UserViewModel({
+    email: 'vitor@mixd.com.br',
+    password: 'mixd102030'
 });
 
 var frameModule = require("ui/frame");
@@ -10,8 +10,18 @@ var page;
 var email;
 
 exports.signIn = function() {
-    email = page.getViewById("email");
-    console.dir(user);
+    user.login()
+        .catch(function(error) {
+            console.log(error);
+            dialogsModule.alert({
+                message: "Unfortunately we could not find your account.",
+                okButtonText: "OK"
+            });
+            return Promise.reject();
+        })
+        .then(function() {
+            frameModule.topmost().navigate("views/list/list");
+        });
 };
 
 exports.register = function() {
@@ -21,5 +31,11 @@ exports.register = function() {
 
 exports.loaded = function(args) {
     page = args.object;
+
+    if (page.ios) {
+        var navigationBar = frameModule.topmost().ios.controller.navigationBar;
+        navigationBar.barStyle = UIBarStyle.UIBarStyleBlack;
+    }
+
     page.bindingContext = user;
 };
