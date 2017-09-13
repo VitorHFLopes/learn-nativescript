@@ -2,3 +2,4 @@
 node_modules
 platforms
 .DS_Store
+GroceriesNg/**/*.js
